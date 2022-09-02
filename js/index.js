@@ -8,10 +8,13 @@ const myObstacles = []
 const canvas = document.querySelector('#canvas');
 const ctx = canvas.getContext('2d');
 let myFrames = 0;
+let myIntervalId;
 
 let car = {
   x: 225,
   y: 300,
+  width: 50,
+  height: 100
 }
 
   function startGame() {
@@ -20,23 +23,20 @@ let car = {
     const carImg = new Image();
     carImg.src = '../images/car.png'; 
     carImg.addEventListener('load', () => {
-      ctx.drawImage(carImg, car.x, car.y, 50,100)
+      ctx.drawImage(carImg, car.x, car.y, car.width, car.height)
     });
 
-    setInterval (() =>{
+    myIntervalId = setInterval (() =>{
       myFrames ++
-
       if (myFrames % 120 === 0) {
-    let minWidth = 30;
+    let minWidth = 100;
     let range = 100;
     let width = Math.floor(Math.random()* range + minWidth) 
     let xPosition = Math.floor(Math.random()*canvas.width)
     myObstacles.push(new Component(width, 20, 'black', xPosition , 0));
       }
-    
-
      ctx.clearRect(0,0, canvas.width, canvas.height);
-     ctx.drawImage(carImg, car.x, car.y, 50,100)
+     ctx.drawImage(carImg, car.x, car.y, car.width, car.height)
       updateObstacles()
     }, 20)
 };
@@ -71,12 +71,27 @@ window.addEventListener('keydown', function(event){
       ctx.fillStyle = this.color;
       ctx.fillRect(this.x, this.y, this.width, this.height);
     }
+
+    collide () {
+      console.log('invoked')
+      if (this.x < car.x + car.width &&
+         this.x + this.width > car.x &&
+          this.y + this.height > car.y &&
+           this.y < car.y + car.height){
+            console.log(myIntervalId)
+          clearInterval(myIntervalId)
+          alert ('collision detected')
+        }
+        
+    }
   }
  
   function updateObstacles () {
     for (let i = 0; i < myObstacles.length; i++){
       myObstacles[i].y += 5;
       myObstacles[i].draw()
+      myObstacles[i].collide()
+      
     }
     
   }
